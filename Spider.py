@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+
 from bs4 import BeautifulSoup
 
 class FinancialStatementFetcher:
@@ -22,7 +23,7 @@ class FinancialStatementFetcher:
                 print("Request successful")
                 content = response.content.decode('cp950')
                 self.content = content
-                return "OK"
+                return None
             else:
                 print("Request failed with status code:", response.status_code)
                 return None
@@ -30,12 +31,12 @@ class FinancialStatementFetcher:
             print("Request failed:", e)
             return None
 
-    def catch_table(self):
-        if self.content is not None:  # 检查内容是否已经获取
+    def catch_table(self): # 抓取特定表格
+        if self.content is not None:
             soup = BeautifulSoup(self.content, 'html.parser')
             div_content = soup.find('div', class_='content')
             if div_content:
-                tables = div_content.find_all('table')[self.types:self.types+1]  # 只取第一個table
+                tables = div_content.find_all('table')[self.types:self.types+1]  # 針對types的內容抓取table
                 for table in tables:
                     rows = table.find_all('tr')[2:]  # 從第三個tr開始
                     Chinese_text = []
