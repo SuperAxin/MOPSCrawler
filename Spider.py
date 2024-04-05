@@ -4,7 +4,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 class FinancialStatementFetcher:
-    def __init__(self, url, types, coid, year, season): # types = [0:資產負債, 1:損益, 2:現金流量, 3:權益變動]
+    def __init__(self, url, types, coid, year, season): # types = [0:資產負債, 1:損益, 2:現金流量]
         self.url = url
         self.params = {
             'step': '1',
