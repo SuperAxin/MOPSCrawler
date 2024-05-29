@@ -8,20 +8,27 @@ class GetFinancialStatement:
         self.url = url
         self.params = {
             'step': '1',
+            'DEBUG': '',
             'CO_ID': str(coid),
-            'SYEAR': year,
-            'SSEASON': season,
+            'SYEAR': str(year),
+            'SSEASON': str(season),
             'REPORT_ID': 'C'
         }
-        self.types = types
+        self.types = int(types)
         self.content = None
 
     def send_request(self):
         try:
+            print(self.url)
             response = requests.post(self.url, params=self.params)
+            print(response.content)
+            print('==================================================================================================')
             if response.status_code == 200:
                 print("Request successful")
-                content = response.content.decode('cp950')
+                content = response.content
+                # print(content)
+                content = content.decode('big5')
+                # print(content)
                 self.content = content
                 return None
             else:
@@ -31,7 +38,35 @@ class GetFinancialStatement:
             print("Request failed:", e)
             return None
 
-    def catch_table(self): # 抓取特定表格
+    def catch_table_old(self): # 2019年之前抓取特定表格抓取特定表格
+        if self.content is not None:
+            soup = BeautifulSoup(self.content, 'html.parser')
+
+            #　篩選table
+            table = soup.find_all('table')[self.types + 1]
+            tr_list = table.find_all('tr')
+            Chinese_text = []
+            Money = []
+            for tr in tr_list:
+                td_list = tr.find_all('td')
+                for td in td_list[0:1]: # 會計科目
+                    text = td.text.strip()
+                    Chinese_text.append(text)
+
+                for td in td_list[1:2]: # 當季金額
+                    number = td.text.strip()
+                    Money.append(number)
+            d = {
+                'Accounts': Chinese_text,
+                'Money': Money
+            }
+
+            df = pd.DataFrame(data=d)
+            return df
+        else:
+            print("No content available. Please call send_request first.")
+        return None
+    def catch_table(self): # 2019年之後抓取特定表格
         if self.content is not None:
             soup = BeautifulSoup(self.content, 'html.parser')
             div_content = soup.find('div', class_='content')
