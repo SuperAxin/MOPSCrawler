@@ -10,10 +10,10 @@ if __name__ == '__main__':
 
     getter = GetFinancialStatement(url, types, coid, year, season)
     response_text = getter.send_request() # POST網址獲取資料
-    if int(year) > 2019:
+    if int(year) >= 2019: # MOPS在2019年改版過, 表格格式不同
         table = getter.catch_table()
     else:
-        table = getter.catch_table_old() # 資料清洗
+        table = getter.catch_table_old()
     table.to_csv('New_Data.csv')
     print(table)
 
