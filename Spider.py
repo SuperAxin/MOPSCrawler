@@ -66,6 +66,7 @@ class GetFinancialStatement:
         else:
             print("No content available. Please call send_request first.")
         return None
+
     def catch_table(self): # 2019年之後抓取特定表格
         if self.content is not None:
             soup = BeautifulSoup(self.content, 'html.parser')
@@ -73,17 +74,17 @@ class GetFinancialStatement:
             if div_content:
                 tables = div_content.find_all('table')[self.types:self.types+1]  # 針對types的內容抓取table
                 for table in tables:
-                    rows = table.find_all('tr')[2:]  # 從第三個tr開始
+                    tr_list = table.find_all('tr')[2:]  # 從第三個tr開始
                     Chinese_text = []
                     Money = []
-                    for row in rows:
-                        datas = row.find_all('td')[1:2]  # 只抓會計科目
-                        for data in datas:
-                            text = data.find('span', class_='zh').text.strip()
+                    for tr in tr_list:
+                        td_list = tr.find_all('td')[1:2]  # 只抓會計科目
+                        for td in td_list:
+                            text = td.find('span', class_='zh').text.strip()
                             Chinese_text.append(text)
-                        datas = row.find_all('td')[2:3]  # 只抓金額
-                        for data in datas:
-                            number = data.text
+                        td_list = tr.find_all('td')[2:3]  # 只抓金額
+                        for td in td_list:
+                            number = td.text
                             Money.append(number)
 
                     print(' ')
